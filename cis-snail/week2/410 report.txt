@@ -1,0 +1,115 @@
+Name: Qianyi Feng
+Course: CIS 410
+Exercise 2 report
+
+2.Partitioning and Mounting: 
+Run your Ubuntu VM image on your laptop, create two partitions on one of the two disks and mount them at /special and /data. Redirect the output of the mount commands to a file named mount.out. Also modify /etc/fstab so that these two partitions are mounted during the system reboot.
+	I have met many problems on exercise 2. Firstly I have done the partition on the dev/sdb disk and want to do the mounting, but I got the error message that shows “wrong fs type, bad option, bad superblock on (the address), missing codepage or helper program, or other error”. I am not sure what’s  going on that, and there was not helpful solution on Google, then I try to mount the dev/sda partitions on /data and /special for testing, and those works. 
+	After talking to professor and classmate, I unmounted the partitions on dev/sda, deleted the original /dev/sdb disk because it has only 2GB space and made a new disk with 20GB space. Then I made partitions and try to mount them on /mnt/data and /mnt/special, which got success. I also used the command “sudo mount -t auto -v /dev/sdb1 /mnt/special > mount.out” and “sudo mount -t auto -v /dev/sdb2 /mnt/data >> mount.out” for redirecting the output of mount commands, and modify /etc/fstab file with “/dev/sdb1 /mnt/special ext3 defaults 0 0” and “/dev/sdb2 /mnt/data ext3 defaults 0 0” for the partitions mounted during the system reboot. For directing the mount.out and modifying /etc/fstab files, I followed the instruction from Google without meeting less stuck than doing mounting part. 
+
+3.Exploring File System: 
+3.1. Gradually fill up /dev partition (e.g., by creating multiple copies of a very large file; "dd" and "yes" are two other commands that can "help" with that).
+	Before doing exercise 3.1, I did many research on Google for making large file commands. There are two commands for dd and yes, which are 
+“dd if=/dev/zero of=test count=(times of writing) bs=(bytes of single writing)”, 
+and “yes abcdefghijklmnopqrstuvwxyz0123456789 > largefile”.  
+I also found a command “fallocate -l (file size) filename”, which was the fastest command among dd, yes and fallocate command. After the partition is roughly 100% full, I tried to use the command “echo ‘Hello world’ > file1”, then there was an error message says “-bash: echo: write error: No space left to device”. 
+
+3.2. Write a program that opens a file and keeps writing on that file without closing the file
+The code of the program:
+
+#include <stdio.h>
+int main()
+{
+	FILE *fp = NULL;
+	int a = 1;
+	fp = fopen(“test.txt”, “w+”);
+	while(a=1){
+		fprintf(fp, “Testing for fprintf…\n”);
+	}
+	return 0;
+}
+
+The unusual action I have taken: (i)manually delete the out file from the file system while the program is still writing on it.
+
+The results of running the program, deleting the output file, and killing the program:
+Before running the program, the available size of current directory is 269G.
+When the a.out is running, the ls command shows there is a test.txt file, and the lsof test.txt command shows that the user is osboxes with a.out command. 
+COMMAND  PID    USER   FD   TYPE DEVICE    SIZE/OFF     NODE NAME
+a.out   5352 osboxes    3u   REG    8,5 13493547008 12845081 test.txt
+
+
+3. When the output file is deleted while the a.out is still running, the ls command shows that there is no test.txt file, and the lsof command shows and error: No such file or directory. The current available directory size is 241G, which shows that the a.out still writing the text to the disk.
+
+lsof: status error on test.txt: No such file or directory
+lsof 4.89
+ latest revision: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/
+ latest FAQ: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/FAQ
+ latest man page: ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/lsof_man
+ usage: [-?abhKlnNoOPRtUvVX] [+|-c c] [+|-d s] [+D D] [+|-E] [+|-e s] [+|-f[gG]]
+ [-F [f]] [-g [s]] [-i [i]] [+|-L [l]] [+m [m]] [+|-M] [-o [o]] [-p s]
+ [+|-r [t]] [-s [p:s]] [-S [t]] [-T [t]] [-u s] [+|-w] [-x [fl]] [--] [names]
+Use the ``-h'' option to get more help information.
+
+
+4. When the a.out has been killed, the current size of the directory returned to 269G. 
+5. Another unusual action: When opening the test.txt file while a.out was still running, the file was blank and the operation of the test.txt file was denied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. Setting Up RAID0 and RAID1:
+I followed the instruction from Google to make RAID0 and RAID1. 
+For RAID0: 
+Personalities : [linear] [multipath] [raid0] [raid1] [raid6] [raid5] [raid4] [raid10] 
+md0 : active raid0 sdc2[1] sdc1[0]
+      10515968 blocks super 1.2 512k chunks
+      
+unused devices: <none>
+ARRAY /dev/md0 metadata=1.2 name=osboxes:0 UUID=3b829cbc:0a480abe:14e5a0cb:ff3ad79f
+
+UUID=2bb59693-9a67-11e8-956d-080027402fd3 none swap sw 0 0
+UUID=28e58bde-9a67-11e8-956d-080027402fd3 / ext4 defaults 0 0
+UUID=2bb59692-9a67-11e8-956d-080027402fd3 /boot ext4 defaults 0 0
+UUID=2d09399a-9a67-11e8-956d-080027402fd3 /home ext4 defaults 0 0
+/dev/sdb1 /mnt/special ext3 defaults 0 0
+/dev/sdb2 /mnt/data ext3 defaults 0 0
+/dev/md0 /mnt/raid ext3 defaults 1 2
+
+For RAID1:
+
+Personalities : [linear] [multipath] [raid0] [raid1] [raid6] [raid5] [raid4] [raid10] 
+md0 : active raid1 sdc2[1] sdc1[0]
+      4993856 blocks super 1.2 [2/2] [UU]
+      
+unused devices: <none>
+ARRAY /dev/md0 metadata=1.2 name=osboxes:0 UUID=b8b7e1d0:af21e16f:52513c5d:a5aae79b
+
+UUID=2bb59693-9a67-11e8-956d-080027402fd3 none swap sw 0 0
+UUID=28e58bde-9a67-11e8-956d-080027402fd3 / ext4 defaults 0 0
+UUID=2bb59692-9a67-11e8-956d-080027402fd3 /boot ext4 defaults 0 0
+UUID=2d09399a-9a67-11e8-956d-080027402fd3 /home ext4 defaults 0 0
+/dev/sdb1 /mnt/special ext3 defaults 0 0
+/dev/sdb2 /mnt/data ext3 defaults 0 0
+/dev/md0 /mnt/raid ext3 defaults 1 2
+
+5. Exploring Other File Types:
+Not regular type files are the files distinguished with text of binary data, such as symbolic links, sockets and directories. For example, the "swap" file in /proc directory.
+When using "cat swaps" command, it shows:
+
+Filename				Type		Size	Used	Priority
+/dev/sda4                               partition	6291452	0	-2
+
+which is the partition type
+
+
+

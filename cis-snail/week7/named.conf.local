@@ -1,0 +1,21 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+zone	"testunusual.com" {
+	type master;
+	file "/etc/bind/forward.testunusual.com";
+	};
+
+zone	"73.168.192.in-addr.arpa" {
+	type master;
+	file "/etc/bind/reverse.testunusual.com";
+	};
+
+zone	"amazon.com" {
+	type master;
+	file "/etc/bind/forward.fake";
+};

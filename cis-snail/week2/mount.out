@@ -1,0 +1,2 @@
+mount: /dev/sdb1 mounted on /mnt/special.
+mount: /dev/sdb2 mounted on /mnt/data.

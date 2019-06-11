@@ -1,0 +1,14 @@
+Personalities : [linear] [multipath] [raid0] [raid1] [raid6] [raid5] [raid4] [raid10] 
+md0 : active raid0 sdc2[1] sdc1[0]
+      10515968 blocks super 1.2 512k chunks
+      
+unused devices: <none>
+ARRAY /dev/md0 metadata=1.2 name=osboxes:0 UUID=3b829cbc:0a480abe:14e5a0cb:ff3ad79f
+
+UUID=2bb59693-9a67-11e8-956d-080027402fd3 none swap sw 0 0
+UUID=28e58bde-9a67-11e8-956d-080027402fd3 / ext4 defaults 0 0
+UUID=2bb59692-9a67-11e8-956d-080027402fd3 /boot ext4 defaults 0 0
+UUID=2d09399a-9a67-11e8-956d-080027402fd3 /home ext4 defaults 0 0
+/dev/sdb1 /mnt/special ext3 defaults 0 0
+/dev/sdb2 /mnt/data ext3 defaults 0 0
+/dev/md0 /mnt/raid ext3 defaults 1 2

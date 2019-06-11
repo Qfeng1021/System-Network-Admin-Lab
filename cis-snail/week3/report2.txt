@@ -1,0 +1,224 @@
+410 Report2
+Qianyi Feng
+
+3. Using dmesg
+Command: dmesg | less
+Linux kernel version: 4.15.0-43
+[    0.000000] Linux version 4.15.0-43-generic (buildd@lgw01-amd64-001) (gcc version 7.3.0 (Ubuntu 7.3.0-16ubuntu3)) #46-Ubuntu SMP Thu Dec 6 14:45:28 UTC 2018 (Ubuntu 4.15.0-43.46-generic 4.15.18)
+
+Command: dmesg | grep Memory
+Available Memory: 3978508k
+[    0.000000] Memory: 3978508K/4193848K available (12300K kernel code, 2472K rwdata, 4252K rodata, 2408K init, 2416K bss, 215340K reserved, 0K cma-reserved)
+[    0.024000] x86/mm: Memory block size: 128MB
+
+Command: dmesg | grep sda
+Hard drives in the system: 
+[    2.026745] sd 2:0:0:0: [sda] 1048576000 512-byte logical blocks: (537 GB/500 GiB)
+[    2.027083] sd 2:0:0:0: [sda] Write Protect is off
+[    2.027409] sd 2:0:0:0: [sda] Mode Sense: 00 3a 00 00
+[    2.027417] sd 2:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+[    2.032921]  sda: sda1 sda2 sda3 sda4 sda5
+[    2.033705] sd 2:0:0:0: [sda] Attached SCSI disk
+[    3.611778] EXT4-fs (sda2): INFO: recovery required on readonly filesystem
+[    3.612076] EXT4-fs (sda2): write access will be enabled during recovery
+[    4.008880] EXT4-fs (sda2): orphan cleanup on readonly fs
+[    4.014933] EXT4-fs (sda2): 19 orphan inodes deleted
+[    4.015231] EXT4-fs (sda2): recovery complete
+[    4.018204] EXT4-fs (sda2): mounted filesystem with ordered data mode. Opts: (null)
+[    4.635847] EXT4-fs (sda2): re-mounted. Opts: (null)
+[    8.225814] EXT4-fs (sda3): recovery complete
+[    8.226535] EXT4-fs (sda3): mounted filesystem with ordered data mode. Opts: (null)
+[    8.271021] Adding 6291452k swap on /dev/sda4.  Priority:-2 extents:1 across:6291452k FS
+[    8.326486] EXT4-fs (sda5): recovery complete
+[    8.326942] EXT4-fs (sda5): mounted filesystem with ordered data mode. Opts: (null)
+
+
+Command:  dmesg | grep eth
+Status of ethernet link
+[    1.694609] e1000 0000:00:03.0 eth0: (PCI:33MHz:32-bit) 08:00:27:25:2c:15
+[    1.694836] e1000 0000:00:03.0 eth0: Intel(R) PRO/1000 Network Connection
+[    1.699656] e1000 0000:00:03.0 enp0s3: renamed from eth0
+
+
+Command: dmesg | grep -i usb
+
+Numbers of USB ports: 2
+
+[    0.956797] usb usb1: New USB device found, idVendor=1d6b, idProduct=0001
+[    0.957071] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+
+[    1.424922] usb 1-1: new full-speed USB device number 2 using ohci-pci
+[    1.752491] usb 1-1: New USB device found, idVendor=80ee, idProduct=0021
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. Using systemctl
+
+4.1: 
+systemctl list-units -all
+systemctl list-units —type=service
+All of them are active
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.2: 
+systemctl show devcdrom.device
+systemctl show atd,service
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.3:
+Commands:
+systemctl list-unit-files —type=service
+systemctl stop apparmor.service
+systemctl start apparmor.service
+
+
+
+
+4.4
+Commands: 
+systemctl list-units —state==inactive
+systemctl list-units —state==failed
+
+The VM shows there are no inactive files.
+
+
+5.Adding a Program to the Boot Process
+
+Summary: I met the problem below:
+● datetest.service - human readable description of service
+   Loaded: loaded (/etc/systemd/system/datetest.service; enabled; vendor preset: enabled)
+   Active: failed (Result: exit-code) since Fri 2019-01-25 08:24:00 UTC; 9s ago
+  Process: 1411 ExecStart=/home/osboxes/.scripts/date.sh (code=exited, status=203/EXEC)
+ Main PID: 1411 (code=exited, status=203/EXEC)
+
+Jan 25 08:24:00 osboxes systemd[1]: Started human readable description of service.
+Jan 25 08:24:00 osboxes systemd[1411]: datetest.service: Failed to execute command: No such file or directory
+Jan 25 08:24:00 osboxes systemd[1411]: datetest.service: Failed at step EXEC spawning /home/osboxes/.scripts/date.sh
+Jan 25 08:24:00 osboxes systemd[1]: datetest.service: Main process exited, code=exited, status=203/EXEC
+Jan 25 08:24:00 osboxes systemd[1]: datetest.service: Failed with result ‘exit-code’.
+
+
+The failed service is because the .sh file deny the permission. 
+Solution: chmod +x filename.sh
+
+
+
+
+
+
+6.
+6.1: 
+Command: systemd-analyze blame
+
+
+
+
+
+
+
+
+
+
+6.2: 
+Command: systemd-analyze critical-chain
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Because there is no tree for the longest-time unit dev-sda2.device, 
+
+
+
+
+
+
+Therefor I looked for the second longest-time unit systemd-networkd-wait-online.service:
+
+
+
+
+
+
+
